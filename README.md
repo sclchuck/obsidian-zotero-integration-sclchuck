@@ -4,8 +4,8 @@ Insert and import citations, bibliographies, notes, and PDF annotations from Zot
 
 You can find the documentation for this plugin [here](https://github.com/mgmeyers/obsidian-zotero-integration/blob/main/docs/README.md). The documentation is currently incomplete. Please reach out if you'd like to help.
 
-## What's new
-#### 1. func
+## What's new in this fork?
+#### 1. func:
 
 You can define js function like this:
 ```js
@@ -25,7 +25,7 @@ If there is return value in func, then this will leave that string here.
 
 with my `Template-SCLChuck.md` in release, you can auto import note grouped with same color.
 
-And you can use [[title_name]] in zotero comment to specify titlename of each note
+And you can use [[title_name]] in zotero comment to specify titlename of each note.
 
 ![s2](https://github.com/sclchuck/obsidian-zotero-integration-sclchuck/assets/51391741/ede03080-35f5-47f6-a831-8c3c6746dc5e)
 
