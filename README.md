@@ -21,6 +21,7 @@ After, you can call function like this:
 ```
 If there is return value in func, then this will leave that string here.
 
+with my template-SCLChuck.md in release, you can auto import note 
 
 
 ## Help, the plugin doesn't load!
