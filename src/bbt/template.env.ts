@@ -199,6 +199,100 @@ export class PersistExtension implements Extension {
   }
 }
 
+export class FuncExtension implements Extension {
+  static id: string = 'FuncExtension';
+  tags: string[] = ['func'];
+
+  parse(parser: any, nodes: any) {
+    // get the tag token
+    const tok = parser.nextToken();
+
+    // parse the args and move after the block end. passing true
+    // as the second arg is required if there are no parentheses
+    const args = parser.parseSignature(null, true);
+    
+    parser.advanceAfterBlockEnd(tok.value);
+
+    // parse the body and possibly the error block, which is optional
+    var body = parser.parseUntilBlocks('error', 'endfunc');
+    var errorBody = null;
+
+    if (parser.skipSymbol('error')) {
+      parser.skip(lexer.TOKEN_BLOCK_END);
+      errorBody = parser.parseUntilBlocks('endfunc');
+    }
+
+    parser.advanceAfterBlockEnd();
+
+    // See above for notes about CallExtension
+    return new nodes.CallExtension(this, 'run', args, [body, errorBody]);
+  }
+
+  run(context: any, func_name: string, ...func_args_body:any[]): any {
+    // execute the statement in a sandbox
+    var sandbox = { context: context };
+    const error_body = func_args_body.pop();
+    const func_body = func_args_body.pop();
+    const func_args = func_args_body
+    try { 
+      // use Function instead of eval
+      var func = new Function(
+          "sandbox", ...func_args, `with (sandbox){${func_body()}}`
+      ); // use backticks and ${} to insert variables
+      var ctx = context.getVariables()
+      if(!(FuncExtension.id in ctx)){
+        context.setVariable(FuncExtension.id, {});
+      }
+      ctx[FuncExtension.id][func_name] = func;
+      return null;
+
+    } catch (err) {
+      if (error_body) {
+        context.setVariable('error', err);
+        return null;
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
+export class FuncCallExtension implements Extension {
+  static id: string = 'FuncCallExtension';
+  tags: string[] = ['func-call', 'callf'];
+
+  parse(parser: any, nodes: any) {
+    // get the tag token
+    const tok = parser.nextToken();
+
+    // parse the args and move after the block end. passing true
+    // as the second arg is required if there are no parentheses
+    const args = parser.parseSignature(null, true);
+    parser.advanceAfterBlockEnd(tok.value);
+
+    return new nodes.CallExtension(this, 'run', args);
+  }
+
+  run(context: any, func_name: string, ...func_args:any[]): any {
+    // execute the statement in a sandbox
+    var sandbox = { context: context };
+    try { 
+      // use Function instead of eval
+      var func = context.getVariables()[FuncExtension.id][func_name];
+      var func_ret = func(sandbox, ...func_args);
+      if(func_ret == undefined)
+        return null;
+      if(typeof(func_ret) != "string"){
+        func_ret = func_ret.toString();
+      }
+      
+      return new nunjucks.runtime.SafeString(func_ret);
+    } catch (err) {
+      throw err;
+    }
+  }
+}
+
 export class ObsidianMarkdownLoader extends Loader {
   sourceFile: string;
 
@@ -275,6 +369,8 @@ export const template = new nunjucks.Environment(loader as any, {
 template.addFilter('filterby', filterBy);
 template.addFilter('format', format);
 template.addExtension(PersistExtension.id, new PersistExtension());
+template.addExtension(FuncExtension.id, new FuncExtension());
+template.addExtension(FuncCallExtension.id, new FuncCallExtension());
 
 export function renderTemplate(
   sourceFile: string,
