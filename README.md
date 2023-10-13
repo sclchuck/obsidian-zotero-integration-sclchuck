@@ -21,8 +21,15 @@ After, you can call function like this:
 ```
 If there is return value in func, then this will leave that string here.
 
-with my template-SCLChuck.md in release, you can auto import note 
+---
 
+with my `Template-SCLChuck.md` in release, you can auto import note grouped with same color.
+
+And you can use [[title_name]] in zotero comment to specify titlename of each note
+
+![s2](https://github.com/sclchuck/obsidian-zotero-integration-sclchuck/assets/51391741/ede03080-35f5-47f6-a831-8c3c6746dc5e)
+
+---
 
 ## Help, the plugin doesn't load!
 
