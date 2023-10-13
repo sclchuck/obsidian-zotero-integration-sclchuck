@@ -16,8 +16,8 @@ You can define js function like this:
 ```
 
 After, you can call function like this:
-```
-{%callf "funcname", variable_1//(variable-value or variable created by {%set%}), ...%}
+```js
+{%callf "funcname", variable_1/*(variable-value or variable created by {%set%})*/, ..., variable_n%}
 ```
 If there is return value in func, then this will leave that string here.
 
